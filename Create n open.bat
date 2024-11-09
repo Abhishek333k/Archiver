@@ -1,26 +1,30 @@
 @echo off
+setlocal enabledelayedexpansion
 
 :: Create folders for each SNOTE number
-md 2176431
-md 2176355
-md 2176024
-md 2175810
-md 2175097
-md 2174761
-md 2174514
-md 2173349
-md 2173279
+md Folder1
+md Folder2
+md Folder3
+md Folder4
+md Folder5
+md Folder6
+md Folder7
+md Folder8
+md Folder9 :: Continue this as many folders you need 
 
-:: Open web pages in Firefox
-start firefox "https://me.sap.com/notes/0002176431"
-start firefox "https://me.sap.com/notes/0002176355"
-start firefox "https://me.sap.com/notes/0002176024"
-start firefox "https://me.sap.com/notes/0002175810"
-start firefox "https://me.sap.com/notes/0002175097"
-start firefox "https://me.sap.com/notes/0002174761"
-start firefox "https://me.sap.com/notes/0002174514"
-start firefox "https://me.sap.com/notes/0002173349"
-start firefox "https://me.sap.com/notes/0002173279"
+:: Initialize the command string for Firefox
+set "firefox_command=start firefox"
+
+:: Read each line from the urls.txt file and append to the command string
+for /f "usebackq delims=" %%u in ("C:\Path\To\Your\urls.txt") do (
+    set "url=%%u"
+    set "firefox_command=!firefox_command! -new-tab !url!"
+)
+
+:: Execute the command to open all URLs in new tabs
+!firefox_command!
 
 :: Pause to allow time for user to save files manually
 pause
+
+endlocal
