@@ -1,8 +1,5 @@
-Certainly! Below is a sample README file that you can use for your GitHub repository. This file includes instructions for using the `urls.txt` file and the `create_folders_and_open_urls.bat` script.
 
-### Sample README.md
-
-```markdown
+```
 # SNOTE URL Batch Script
 
 This repository contains a batch script that creates folders for specified SNOTE numbers and opens corresponding URLs in new tabs in Firefox. 
