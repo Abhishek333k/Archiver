@@ -23,8 +23,7 @@ This repository contains a batch script that creates folders for specified SNOTE
 
 1. Create a text file named `urls.txt`.
 2. Add the URLs you want to open, one per line. For example:
-   ```
-      http://link1.com
+   ```http://link1.com
       http://link2.com
       http://link3.com
       http://link4.com
@@ -32,8 +31,7 @@ This repository contains a batch script that creates folders for specified SNOTE
       http://link6.com
       http://link7.com
       http://link8.com
-      http://link9.com
-   ```
+      http://link9.com  ```
 3. Save this file in the same directory as the batch script.
 
 ### Step 2: Configure the Batch Script
