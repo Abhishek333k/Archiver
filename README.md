@@ -40,8 +40,7 @@ This repository contains a batch script that creates folders for specified SNOTE
 2. Ensure that the path to `urls.txt` is correctly set in the script:
    ```batch
    for /f "usebackq delims=" %%u in ("C:\Path\To\Your\urls.txt") do (
-   ```
-   Replace `C:\Path\To\Your\urls.txt` with the actual path where your `urls.txt` file is located.
+   ``` Replace `C:\Path\To\Your\urls.txt` with the actual path where your `urls.txt` file is located.
 
 ### Step 3: Run the Batch Script
 
