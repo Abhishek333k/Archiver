@@ -1,0 +1,10 @@
+:: SAVE YOUR LINKS IN THIS DUMPER TEXT FILE IN THIS FORMATE 
+http://link1.com
+http://link2.com
+http://link3.com
+http://link4.com
+http://link5.com
+http://link6.com
+http://link7.com
+http://link8.com
+http://link9.com
