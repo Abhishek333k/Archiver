@@ -27,4 +27,7 @@ for /f "usebackq delims=" %%u in ("C:\Path\To\Your\urls.txt") do (
 :: Pause to allow time for user to save files manually
 pause
 
+:: Exit the script and close the Command Prompt window
+exit
+
 endlocal
