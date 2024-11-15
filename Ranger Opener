@@ -1,14 +1,9 @@
 @echo off
 setlocal enabledelayedexpansion
 
-:: Prompt user for input range
-set /p "input_range=Enter the range (e.g., 1-700): "
-
-:: Parse the input range
-for /f "tokens=1,2 delims=-" %%a in ("%input_range%") do (
-    set "start=%%a"
-    set "end=%%b"
-)
+:: Prompt user for start and end range
+set /p "start=Enter the start index (e.g., 1): "
+set /p "end=Enter the end index (e.g., 3): "
 
 :: Initialize the command string for Firefox
 set "firefox_command=start firefox"
