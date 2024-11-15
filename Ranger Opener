@@ -1,19 +1,20 @@
 @echo off
 setlocal enabledelayedexpansion
 
-:: Prompt user for start and end range
-set /p "start=Enter the start index (e.g., 1): "
-set /p "end=Enter the end index (e.g., 3): "
+:: Prompt user for start and end SNOTE numbers
+set /p "start_snote=Enter the start SNOTE number (e.g., 2176431): "
+set /p "end_snote=Enter the end SNOTE number (e.g., 2175810): "
 
 :: Initialize the command string for Firefox
 set "firefox_command=start firefox"
 
 :: Read each line from urls.txt and open matching URLs based on user input
-set count=0
-for /f "tokens=1,2,3 delims=: " %%i in (urls.txt) do (
-    set /a count+=1
-    if !count! geq !start! if !count! leq !end! (
-        set "url=%%k"
+for /f "tokens=1,2 delims=: " %%i in (urls.txt) do (
+    set "snote=%%i"
+    set "url=%%j"
+    
+    :: Check if the current SNOTE is within the specified range
+    if !snote! geq !start_snote! if !snote! leq !end_snote! (
         set "firefox_command=!firefox_command! -new-tab !url!"
     )
 )
