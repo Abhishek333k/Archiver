@@ -1,0 +1,30 @@
+@echo off
+setlocal
+
+if "%~1"=="" (
+    echo Please provide an Excel file as an argument.
+    echo Usage: XLS2CSV.bat inputFile.xlsx [outputFile.csv]
+    exit /b
+)
+
+set "inputFile=%~1"
+set "outputFile=%~dpn1.csv"
+
+if "%~2" neq "" set "outputFile=%~2"
+
+:: Create a temporary VBScript to perform the conversion
+(
+echo Set objExcel = CreateObject("Excel.Application")
+echo Set objWorkbook = objExcel.Workbooks.Open("%inputFile%")
+echo objWorkbook.SaveAs "%outputFile%", 6 ' 6 = xlCSV
+echo objWorkbook.Close False
+echo objExcel.Quit
+) > "%temp%\convert.vbs"
+
+:: Run the VBScript
+cscript //nologo "%temp%\convert.vbs"
+
+:: Clean up
+del "%temp%\convert.vbs"
+
+endlocal
