@@ -8,8 +8,8 @@ set /p "end_snote=Enter the end SNOTE number (e.g., 2175810): "
 :: Initialize the command string for Firefox
 set "firefox_command=start firefox"
 
-:: Read each line from urls.txt and open matching URLs based on user input
-for /f "tokens=1,2 delims=: " %%i in (urls.txt) do (
+:: Read each line from the converted CSV and open matching URLs based on user input
+for /f "tokens=1,2 delims=," %%i in (my_data.csv) do (
     set "snote=%%i"
     set "url=%%j"
     
