@@ -1,0 +1,29 @@
+@echo off
+setlocal enabledelayedexpansion
+
+REM Define the source directory where your .SAR files are located
+set "source_dir=Z:\CA\OSS Notes\CC-BW\BW-BEX4\Jul 19, 2016 - Jan 28, 2017"
+REM Define the destination directory where folders are located
+set "dest_dir=Z:\CA\OSS Notes\CC-BW\BW-BEX4\Jul 19, 2016 - Jan 28, 2017"
+
+REM Change to the source directory
+cd /d "%source_dir%" || (echo Failed to change directory to %source_dir% & exit /b)
+
+REM Loop through each .SAR file in the source directory
+for %%F in (*.SAR) do (
+    REM Extract the folder name from the filename (remove leading zeros and suffix)
+    set "folder_name=%%~nF"
+    set "folder_name=!folder_name:~3,-3!"  REM Remove '000' prefix and '_00' suffix
+
+    REM Check if the folder exists, if not, create it
+    if not exist "%dest_dir%\!folder_name!" (
+        mkdir "%dest_dir%\!folder_name!" || (echo Failed to create folder !folder_name! & exit /b)
+    )
+
+    REM Move the file to its respective folder
+    echo Moving file: %%F to folder: !folder_name!
+    move "%%F" "%dest_dir%\!folder_name!\" || (echo Failed to move: %%F to !folder_name! & exit /b)
+)
+
+echo Move operation completed.
+endlocal
