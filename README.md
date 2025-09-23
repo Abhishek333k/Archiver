@@ -1,116 +1,50 @@
-@echo off
-setlocal enabledelayedexpansion
 
-:main_menu
-cls
-echo =================================================================
-echo                      SAP Note Application
-echo =================================================================
-echo.
-echo Please select an option:
-echo.
-echo    1. Process local SAR and TXT files
-echo    2. Process and open URLs in Firefox
-echo.
-set /p "choice=Enter your choice (1 or 2): "
+```
+# SNOTE URL Batch Script
 
-if /i "%choice%"=="1" goto file_processing
-if /i "%choice%"=="2" goto url_processing
-goto main_menu
+This repository contains a batch script that creates folders for specified SNOTE numbers and opens corresponding URLs in new tabs in Firefox. 
 
-:file_processing
-cls
-echo =================================================================
-echo                File Processing Mode Activated
-echo =================================================================
+## Contents
 
-:file_process_loop
-REM Check for and process any .SAR and .txt files
-dir /b *.SAR >nul 2>&1
-if not errorlevel 1 (
-    for /f "delims=" %%F in ('dir /b *.SAR') do (
-        set "sar_file=%%F"
-        goto :process_files
-    )
-)
+- `urls.txt`: A text file containing the list of URLs to be opened.
+- `create_folders_and_open_urls.bat`: A batch script that creates folders and opens the URLs from `urls.txt`.
 
-REM This section is only reached when no .SAR files are found
-echo.
-echo All files have been processed. Waiting for new files.
-echo Type "exit" or "E" and press Enter to return to the main menu.
-echo.
-set /p "user_input=>> "
-if /i "!user_input!"=="exit" goto main_menu
-if /i "!user_input!"=="e" goto main_menu
+## Prerequisites
 
-REM Wait for a moment and then loop back to check for files again
-timeout /t 5 /nobreak >nul
-goto file_process_loop
+- **Windows Operating System**: This script is designed to run on Windows.
+- **Firefox Browser**: Ensure that Firefox is installed on your system.
 
-:process_files
-    REM Extract the folder name from the SAR filename
-    set "folder_name=!sar_file:~3,-7!"
+## Instructions
 
-    REM Check if the folder exists, if not, create it
-    if not exist "!folder_name!" (
-        mkdir "!folder_name!"
-        echo [+] Created folder: !folder_name!
-    )
+### Step 1: Prepare `urls.txt`
 
-    echo.
-    echo [+] Processing SNOTE !folder_name!
-    
-    REM Move the .SAR file to its respective folder
-    echo Moving file: !sar_file! to folder: !folder_name!
-    move "!sar_file!" "!folder_name!\" || (echo Failed to move: !sar_file! to !folder_name! & exit /b)
+1. Create a text file named `urls.txt`.
+2. Add the URLs you want to open, one per line. For example:
+   ```http://link1.com
+      http://link2.com
+      http://link3.com
+      http://link4.com
+      http://link5.com
+      http://link6.com
+      http://link7.com
+      http://link8.com
+      http://link9.com  ```
+3. Save this file in the same directory as the batch script.
 
-    REM Process all corresponding .txt files
-    echo Searching for text files...
-    for %%T in ("!folder_name!*.txt") do (
-        echo Moving text file: %%T to folder: !folder_name!
-        move "%%T" "!folder_name!\" || (echo Failed to move: %%T to !folder_name! & exit /b)
-    )
+### Step 2: Configure the Batch Script
 
-    echo.
-    echo Operation for SNOTE !folder_name! completed.
-    
-    :: The 5-second countdown before the next operation
-    set /a countdown_time=5
-    echo Time until next operation:
-    :countdown_loop
-        <nul set /p "=!countdown_time!..."
-        timeout /t 1 /nobreak >nul
-        set /a countdown_time-=1
-        if !countdown_time! gtr 0 goto :countdown_loop
+1. Open the `create_folders_and_open_urls.bat` file in a text editor.
+2. Ensure that the path to `urls.txt` is correctly set in the script:
+   ```batch
+   for /f "usebackq delims=" %%u in ("C:\Path\To\Your\urls.txt") do (
+   ``` Replace `C:\Path\To\Your\urls.txt` with the actual path where your `urls.txt` file is located.
 
-    echo.
-    goto file_process_loop
+### Step 3: Run the Batch Script
 
+1. Double-click on `create_folders_and_open_urls.bat` to execute it.
+2. The script will create folders named after specified SNOTE numbers and open all URLs listed in `urls.txt` in new tabs in Firefox.
 
-:url_processing
-cls
-echo =================================================================
-echo                 URL Processing Mode Activated
-echo =================================================================
-echo.
-echo Paste a single URL and press Enter.
-echo Type "exit" or "E" to return to the main menu.
-echo.
+### Notes
 
-:url_input_loop
-set /p "user_input=>> "
-
-if /i "!user_input!"=="exit" goto main_menu
-if /i "!user_input!"=="e" goto main_menu
-
-if not defined user_input (
-    echo No URL entered.
-    goto url_input_loop
-)
-
-echo Opening link: !user_input!
-start "" "firefox" -new-tab "!user_input!"
-
-goto url_input_loop
-
-endlocal
+- Ensure that you have permission to access and open the specified URLs.
+- The folders created will be located in the same directory where you run the batch script.
