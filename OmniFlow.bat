@@ -30,7 +30,7 @@ dir /b *.SAR >nul 2>&1
 if not errorlevel 1 (
     for /f "delims=" %%F in ('dir /b *.SAR') do (
         set "sar_file=%%F"
-        goto :process_files
+        goto :process_sar
     )
 )
 
@@ -38,12 +38,34 @@ REM Check for and process any .txt files left in the main folder
 dir /b *.txt >nul 2>&1
 if not errorlevel 1 (
     for /f "delims=" %%T in ('dir /b *.txt') do (
-        set "txt_file=%%T"
-        goto :process_txt_files
+        REM Extract the SNOTE number from the filename up to the first space
+        set "filename=%%~nT"
+        
+        :: Find the position of the first space and extract the SNOTE number
+        for /f "tokens=1*" %%s in ("!filename!") do (
+            set "snote_number=%%s"
+        )
+        
+        REM Check if the folder exists; if not, create it
+        if not exist "!snote_number!\" (
+            mkdir "!snote_number!\"
+            echo [+] Created folder for TXT file: !snote_number!
+        )
+
+        echo.
+        echo Moving file: %%T to folder: !snote_number!
+        move "%%T" "!snote_number!\" >nul 2>&1
+                
+        if errorlevel 1 (
+                    echo Failed to move: %%T to !snote_number!
+        ) else (
+                    echo Successfully moved: %%T to !snote_number!
+        )
     )
+    REM No need to use goto here since the loop handles each file
 )
 
-REM This section is only reached when no .SAR files are found
+REM This section is only reached when no files are found
 echo.
 echo All files have been processed. Waiting for new files.
 echo Type "exit" or "E" and press Enter to return to the main menu.
@@ -56,7 +78,7 @@ REM Wait for a moment and then loop back to check for files again
 timeout /t 5 /nobreak >nul
 goto file_process_loop
 
-:process_files
+:process_sar
     REM Extract the folder name from the SAR filename
     set "folder_name=!sar_file:~3,-7!"
 
@@ -93,32 +115,6 @@ goto file_process_loop
         if !countdown_time! gtr 0 goto :countdown_loop
 
     echo.
-    goto file_process_loop
-
-:process_txt_files
-    REM Extract the SNOTE number from the filename up to the first space
-    set "filename=%%~nF"
-    
-    REM Find the position of the first space and extract the SNOTE number
-    for /f "tokens=1*" %%s in ("!filename!") do (
-        set "snote=%%s"
-    )
-
-    REM Check if the folder exists; if not, create it
-    if not exist "!snote!\" (
-        mkdir "!snote!\"
-        echo [+] Created folder for TXT file: !snote!
-    )
-
-    echo.
-    echo Moving file: !txt_file! to folder: !snote!
-    move "!txt_file!" "!snote!\" >nul 2>&1
-            
-    if errorlevel 1 (
-        echo Failed to move: !txt_file! to !snote!
-    ) else (
-        echo Successfully moved: !txt_file! to !snote!
-    )
     goto file_process_loop
 
 :url_processing
