@@ -37,30 +37,101 @@ echo =================================================================
 echo.
 
 :organizer_loop
-REM Check for and process any .SAR and .txt files
+REM --- Process all .SAR files in the current directory ---
 dir /b *.SAR >nul 2>&1
 if not errorlevel 1 (
     for /f "delims=" %%F in ('dir /b *.SAR') do (
         set "sar_file=%%F"
-        goto :process_sar
+        
+        REM Extract the folder name from the SAR filename
+        set "folder_name=!sar_file:~3,-7!"
+
+        REM Check if the folder exists, if not, create it
+        if not exist "!folder_name!" (
+            mkdir "!folder_name!"
+            echo [+] Created folder: !folder_name!
+        )
+
+        echo.
+        echo [+] Processing SNOTE !folder_name!
+        
+        REM Move the .SAR file to its respective folder
+        echo Moving file: !sar_file! to folder: !folder_name!
+        move "!sar_file!" "!folder_name!\" || (echo Failed to move: !sar_file! to !folder_name! & exit /b)
+
+        REM Process all corresponding .txt files
+        echo Searching for text files...
+        for %%T in ("!folder_name!*.txt") do (
+            echo Moving text file: %%T to folder: !folder_name!
+            move "%%T" "!folder_name!\" || (echo Failed to move: %%T to !folder_name! & exit /b)
+        )
+
+        echo.
+        echo Operation for SNOTE !folder_name! completed.
+        
+        :: The 5-second countdown before the next operation
+        set /a countdown_time=5
+        echo Time until next operation:
+        :countdown_loop_sar
+            <nul set /p "=!countdown_time!..."
+            timeout /t 1 /nobreak >nul
+            set /a countdown_time-=1
+            if !countdown_time! gtr 0 goto :countdown_loop_sar
+        echo.
     )
 )
 
-REM Check for and process any .txt files left in the main folder
+REM --- Process all .txt files left in the main folder ---
 dir /b *.txt >nul 2>&1
 if not errorlevel 1 (
     for /f "delims=" %%T in ('dir /b *.txt') do (
         set "txt_file=%%T"
-        goto :process_txt
+        
+        REM Extract the SNOTE number from the filename
+        set "filename=%%~nT"
+        
+        for /f "tokens=1*" %%s in ("!filename!") do (
+            set "snote_number=%%s"
+        )
+
+        REM Check if the folder exists; if not, create it
+        if not exist "!snote_number!\" (
+            mkdir "!snote_number!\"
+            echo [+] Created folder for TXT file: !snote_number!
+        )
+
+        echo.
+        echo Moving file: !txt_file! to folder: !snote_number!
+        move "!txt_file!" "!snote_number!\" >nul 2>&1
+        if errorlevel 1 (
+            echo Failed to move: !txt_file! to !snote_number!
+        ) else (
+            echo Successfully moved: !txt_file! to !snote_number!
+        )
     )
 )
 
-REM Check for and process any .pdf files left in the main folder
+REM --- Process all .pdf files left in the main folder ---
 dir /b *.pdf >nul 2>&1
 if not errorlevel 1 (
     for /f "delims=" %%P in ('dir /b *.pdf') do (
         set "pdf_file=%%P"
-        goto :process_pdf
+        
+        set "file_name=%%~nP"
+        for /f "tokens=1 delims=-" %%A in ("!file_name!") do (
+            set "folder_name=%%A"
+        )
+        set "folder_name=!folder_name: =!"
+
+        if not exist "!folder_name!\" (
+            mkdir "!folder_name!\" || (echo Failed to create folder !folder_name! & exit /b)
+            echo [+] Created folder: !folder_name!
+        ) else (
+            echo Folder already exists: !folder_name!
+        )
+
+        echo Moving file: !pdf_file! to folder: !folder_name!
+        move "!pdf_file!" "!folder_name!\" || (echo Failed to move: !pdf_file! to !folder_name! & exit /b)
     )
 )
 
@@ -74,70 +145,6 @@ if /i "!user_input!"=="e" goto main_menu
 
 timeout /t 5 /nobreak >nul
 goto organizer_loop
-
-:process_sar
-    set "folder_name=!sar_file:~3,-7!"
-    if not exist "!folder_name!" (
-        mkdir "!folder_name!"
-        echo [+] Created folder: !folder_name!
-    )
-    echo.
-    echo [+] Processing SNOTE !folder_name!
-    echo Moving file: !sar_file! to folder: !folder_name!
-    move "!sar_file!" "!folder_name!\" || (echo Failed to move: !sar_file! to !folder_name! & exit /b)
-    echo Searching for text files...
-    for %%T in ("!folder_name!*.txt") do (
-        echo Moving text file: %%T to folder: !folder_name!
-        move "%%T" "!folder_name!\" || (echo Failed to move: %%T to !folder_name! & exit /b)
-    )
-    echo.
-    echo Operation for SNOTE !folder_name! completed.
-    
-    set /a countdown_time=5
-    echo Time until next operation:
-    :countdown_loop_sar
-        <nul set /p "=!countdown_time!..."
-        timeout /t 1 /nobreak >nul
-        set /a countdown_time-=1
-        if !countdown_time! gtr 0 goto :countdown_loop_sar
-    echo.
-    goto organizer_loop
-
-:process_txt
-    set "filename=%%~nT"
-    for /f "tokens=1*" %%s in ("!filename!") do (
-        set "snote_number=%%s"
-    )
-    if not exist "!snote_number!\" (
-        mkdir "!snote_number!\"
-        echo [+] Created folder for TXT file: !snote_number!
-    )
-    echo.
-    echo Moving file: !txt_file! to folder: !snote_number!
-    move "!txt_file!" "!snote_number!\" >nul 2>&1
-    if errorlevel 1 (
-        echo Failed to move: !txt_file! to !snote_number!
-    ) else (
-        echo Successfully moved: !txt_file! to !snote_number!
-    )
-    goto organizer_loop
-
-:process_pdf
-    set "file_name=%%~nP"
-    for /f "tokens=1 delims=-" %%A in ("!file_name!") do (
-        set "folder_name=%%A"
-    )
-    set "folder_name=!folder_name: =!"
-    if not exist "!folder_name!\" (
-        mkdir "!folder_name!\" || (echo Failed to create folder !folder_name! & exit /b)
-        echo [+] Created folder: !folder_name!
-    ) else (
-        echo Folder already exists: !folder_name!
-    )
-    echo Moving file: !pdf_file! to folder: !folder_name!
-    move "!pdf_file!" "!folder_name!\" || (echo Failed to move: !pdf_file! to !folder_name! & exit /b)
-    goto organizer_loop
-
 
 :url_opener
 cls
@@ -161,7 +168,6 @@ if not defined user_input (
 echo Opening link: !user_input!
 start "" "firefox" -new-tab "!user_input!"
 goto url_input_loop
-
 
 :file_renamer
 cls
@@ -197,7 +203,6 @@ echo.
 echo Renaming operation completed.
 pause
 goto main_menu
-
 
 :zero_kb_finder
 cls
